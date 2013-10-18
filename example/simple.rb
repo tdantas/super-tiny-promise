@@ -13,14 +13,7 @@ def with_board(title = "",&block)
   end
 end
 
-
 promise = Promise.new
-
-content_type = proc do |value| 
-  with_board('content-type') do 
-    p value
-  end
-end
 
 content_type = proc do |f| 
   with_board('content-type') do 
@@ -35,15 +28,15 @@ base_uri = proc do |f|
   end
 end 
 
-promise.then(content_type)
-promise.then(base_uri)
-
 t = Thread.new do 
   open("http://www.google.com") do |f|
     promise.fulfill(f)
   end
 end
 
+
+promise.then(content_type)
+promise.then(base_uri)
 
 puts "Waiting for Tread finish"
 t.join
