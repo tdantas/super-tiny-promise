@@ -3,7 +3,6 @@ require 'promise'
 require 'thread'
 require 'open-uri'
 
-promise = Promise.new
 
 def with_board(title = "",&block)
   if block_given?
@@ -13,6 +12,9 @@ def with_board(title = "",&block)
     puts "-" * header.length
   end
 end
+
+
+promise = Promise.new
 
 content_type = proc do |value| 
   with_board('content-type') do 
@@ -36,9 +38,14 @@ end
 promise.then(content_type)
 promise.then(base_uri)
 
-Thread.new do 
+t = Thread.new do 
   open("http://www.google.com") do |f|
     promise.fulfill(f)
   end
-end.join
+end
+
+
+puts "Waiting for Tread finish"
+t.join
+
 
