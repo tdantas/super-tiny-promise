@@ -24,7 +24,7 @@ t = Thread.new do
   end
 end
 
-puts "Waiting for Tread finish"
+puts "Waiting for Thread finish"
 t.join
 
 
