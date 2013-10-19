@@ -9,24 +9,32 @@ Just to implement promises following the CommonJS Specs.
 
 ````
 
-promise = Promise.new
+ #content-type callback
+ callback_content_type = proc do |f| 
+   p f.content_type
+ end
 
-content_type = proc do |f| 
-  puts f.content_type
-  return  f
-end
+ #base-uri callback
+ callback_base_uri = proc do |f|
+   p f.base_uri
+ end 
 
-promise.then(content_type)
+ promise = Promise.new
 
-t = Thread.new do 
-  open("http://www.google.com") do |f|
-    promise.fulfill(f)
-  end
-end
+ t = Thread.new do 
+   open("http://blog.tdantas.com") do |f|
+     promise.fulfill(f)
+   end
+ end
 
-puts "Waiting for Tread finish"
-t.join
+ promise.then(content_type).then(base_uri)
 
+ t.join  #waiting the thread before finish
 
 ````
 
+
+## Todo
+
+* Thenanble
+* Build the Promise Resolution Procedure properly

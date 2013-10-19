@@ -1,7 +1,5 @@
 require 'thread'
 require 'callback'
-require 'errorback'
-
 class Promise
 
   def initialize
@@ -13,30 +11,20 @@ class Promise
   end
 
   def then(onFulfilled = nil, onRejected = nil)
-    promise = Promise.new
-
-    @callbacks.push(Callback.new(promise, onFulfilled))   if valid_callback?(onFulfilled)
-    @errorbacks.push(Errorback.new(promise, onRejected))  if valid_callback?(onRejected)
+    @callbacks.push(Callback.new(onFulfilled))  if valid_callback?(onFulfilled)
+    @errorbacks.push(Callback.new(onRejected))  if valid_callback?(onRejected)
     
-    if fulfilled?
-      @callbacks.each do |callback| 
-        callback.call(@value) 
-      end
+    if fulfilled? or rejected?
+      run_callbacks
     end
 
-    if rejected?
-      @errorbacks.each do |errorback| 
-        errorback.call(@value)
-      end
-    end
-
-    return promise
+    self
   end
 
   def fulfill(value)
     @mutex.synchronize do
       if pending?
-        @value = value 
+        @value = value       
         @state = :fulfilled
         run_callbacks
       end
