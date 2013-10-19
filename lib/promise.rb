@@ -7,13 +7,12 @@ class Promise
     @state  = :pending
     @callbacks  =  [ ]
     @errorbacks =  [ ]
-    @mutex = Mutex.new
   end
 
   def then(onFulfilled = nil, onRejected = nil)
-    @callbacks.push(Callback.new(onFulfilled))  if valid_callback?(onFulfilled)
-    @errorbacks.push(Callback.new(onRejected))  if valid_callback?(onRejected)
-    
+    push_errorback onRejected
+    push_callback  onFulfilled
+
     if fulfilled? or rejected?
       run_callbacks
     end
@@ -22,22 +21,18 @@ class Promise
   end
 
   def fulfill(value)
-    @mutex.synchronize do
-      if pending?
-        @value = value       
-        @state = :fulfilled
-        run_callbacks
-      end
+    if pending?
+      @value = value       
+      @state = :fulfilled
+      run_callbacks
     end
   end
 
   def reject(value)
-    @mutex.synchronize do
-      if pending?
-        @value = value 
-        @state  = :rejected
-        run_callbacks
-      end
+    if pending?
+      @value = value 
+      @state  = :rejected
+      run_callbacks
     end
   end
 
@@ -64,6 +59,14 @@ class Promise
   private 
   def valid_callback?(callback)
     (!!callback && callback.respond_to?(:call))
+  end
+
+  def push_errorback(onRejected)
+    @errorbacks.push(Callback.new(onRejected))  if valid_callback?(onRejected)
+  end
+
+  def push_callback(onFulfilled)
+    @callbacks.push(Callback.new(onFulfilled))  if valid_callback?(onFulfilled)
   end
 
   def run_callbacks
