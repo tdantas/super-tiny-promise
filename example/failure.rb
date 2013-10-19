@@ -4,7 +4,7 @@ require 'thread'
 require 'open-uri'
 
 content_type = proc do |f| 
-  puts "ERROR if this you are reading this message"
+  puts "ERROR if you are reading this message"
 end
 
 on_failure = proc do |e| 
@@ -30,7 +30,6 @@ end
 promise
   .then(content_type, on_failure)
   .then(content_type, on_failure_chain)
-
 
 puts "Waiting for Tread finish"
 t.join
