@@ -37,4 +37,4 @@ Just to implement promises following the CommonJS Specs.
 ## Todo
 
 * Thenanble
-* Build the Promise Resolution Procedure properly
+* Build the Promise Resolution Procedure 
